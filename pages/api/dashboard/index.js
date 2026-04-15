@@ -17,9 +17,13 @@ export default async function handler(req, res) {
   const user = await requireAuth(req, res, ["admin", "manager"]);
   if (!user) return;
 
-  const d          = new Date();
-  const today      = d.toISOString().slice(0, 10);
-  const monthStart = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+  // Compute today's date in the restaurant's local timezone (not the UTC server
+  // clock). Without this, between midnight local time and midnight UTC the wrong
+  // date string would be passed to expense queries, skewing the profit totals.
+  const TZ         = process.env.DB_TIMEZONE || "UTC";
+  const today      = new Date().toLocaleDateString("en-CA", { timeZone: TZ });
+  const [year, mo] = today.split("-");
+  const monthStart = `${year}-${mo}-01`;
 
   try {
     const [stats, hourly, recentOrders, todaySales, monthlySales, todayExpenses, monthlyExpenses] = await Promise.all([

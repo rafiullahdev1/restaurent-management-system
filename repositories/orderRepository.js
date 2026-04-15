@@ -133,7 +133,9 @@ export async function listOrders({ ownUserId, dateFilter, paymentStatus, orderTy
   }
 
   if (dateFilter === "today") {
-    conditions.push(`DATE(o.created_at) = CURRENT_DATE`);
+    conditions.push(
+      `o.created_at >= CURRENT_DATE::TIMESTAMP AND o.created_at < (CURRENT_DATE + INTERVAL '1 day')::TIMESTAMP`
+    );
   }
 
   if (paymentStatus === "unpaid") {

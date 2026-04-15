@@ -13,7 +13,7 @@ import { query } from "../lib/db";
 export async function getDashboardStats() {
   const [salesRes, kitchenRes, broadRes] = await Promise.all([
 
-    // Today's sales stats
+    // Today's sales stats — range covers exactly 12:00 AM to 11:59:59 PM local time
     query(
       `SELECT
          COUNT(DISTINCT o.id)                                               AS total_orders,
@@ -26,7 +26,8 @@ export async function getDashboardStats() {
          )                                                                   AS avg_order_value
        FROM   orders  o
        LEFT   JOIN payments p ON p.order_id = o.id
-       WHERE  DATE(o.created_at) = CURRENT_DATE`
+       WHERE  o.created_at >= CURRENT_DATE::TIMESTAMP
+         AND  o.created_at <  (CURRENT_DATE + INTERVAL '1 day')::TIMESTAMP`
     ),
 
     // Live kitchen queue
@@ -41,7 +42,8 @@ export async function getDashboardStats() {
       `SELECT
          COALESCE(SUM(
            CASE WHEN p.status = 'paid'
-                AND DATE_TRUNC('month', o.created_at) = DATE_TRUNC('month', CURRENT_DATE)
+                AND o.created_at >= DATE_TRUNC('month', CURRENT_DATE::TIMESTAMP)
+                AND o.created_at <  DATE_TRUNC('month', CURRENT_DATE::TIMESTAMP) + INTERVAL '1 month'
                 THEN p.amount END
          ), 0) AS monthly_revenue,
          COUNT(DISTINCT
@@ -73,7 +75,8 @@ export async function getTodayHourly() {
        COALESCE(SUM(CASE WHEN p.status = 'paid' THEN p.amount END), 0) AS revenue
      FROM   orders  o
      LEFT   JOIN payments p ON p.order_id = o.id
-     WHERE  DATE(o.created_at) = CURRENT_DATE
+     WHERE  o.created_at >= CURRENT_DATE::TIMESTAMP
+       AND  o.created_at <  (CURRENT_DATE + INTERVAL '1 day')::TIMESTAMP
      GROUP  BY hour
      ORDER  BY hour ASC`
   );
@@ -114,7 +117,8 @@ export async function getTodayProductSales() {
      FROM   order_items oi
      JOIN   orders   o ON o.id    = oi.order_id
      JOIN   payments p ON p.order_id = o.id AND p.status = 'paid'
-     WHERE  DATE(o.created_at) = CURRENT_DATE
+     WHERE  o.created_at >= CURRENT_DATE::TIMESTAMP
+       AND  o.created_at <  (CURRENT_DATE + INTERVAL '1 day')::TIMESTAMP
      GROUP  BY oi.product_name, oi.variant_name
      ORDER  BY total_qty DESC, oi.product_name ASC`
   );
@@ -135,7 +139,8 @@ export async function getMonthlyProductSales() {
      FROM   order_items oi
      JOIN   orders   o ON o.id    = oi.order_id
      JOIN   payments p ON p.order_id = o.id AND p.status = 'paid'
-     WHERE  DATE_TRUNC('month', o.created_at) = DATE_TRUNC('month', CURRENT_DATE)
+     WHERE  o.created_at >= DATE_TRUNC('month', CURRENT_DATE::TIMESTAMP)
+       AND  o.created_at <  DATE_TRUNC('month', CURRENT_DATE::TIMESTAMP) + INTERVAL '1 month'
      GROUP  BY oi.product_name, oi.variant_name
      ORDER  BY total_qty DESC, oi.product_name ASC`
   );

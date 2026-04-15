@@ -10,9 +10,10 @@ export default async function handler(req, res) {
   const user = await requireAuth(req, res, ["admin", "manager"]);
   if (!user) return;
 
-  const d          = new Date();
-  const todayStr   = d.toISOString().slice(0, 10);
-  const monthStr   = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-01`;
+  const TZ            = process.env.DB_TIMEZONE || "UTC";
+  const todayStr      = new Date().toLocaleDateString("en-CA", { timeZone: TZ });
+  const [year, mo]    = todayStr.split("-");
+  const monthStr      = `${year}-${mo}-01`;
 
   const rangeFrom = req.query.date_from || monthStr;
   const rangeTo   = req.query.date_to   || todayStr;
