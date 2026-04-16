@@ -457,11 +457,16 @@ export default function OrdersPage() {
 
       {error && <p className="form-error" style={{ marginBottom: "12px" }}>{error}</p>}
 
-      {/* Table */}
-      <div className="table-container">
-        {loading ? (
+      {/* Loading state */}
+      {loading && (
+        <div className="table-container" style={{ padding: "40px" }}>
           <PageLoader />
-        ) : (
+        </div>
+      )}
+
+      {/* Desktop: Table */}
+      {!loading && (
+        <div className="table-container desktop-table-wrap">
           <table className="data-table orders-table">
             <thead>
               <tr>
@@ -549,8 +554,74 @@ export default function OrdersPage() {
               )}
             </tbody>
           </table>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Mobile: Cards */}
+      {!loading && (
+        <div className="mobile-cards-wrap">
+          {orders.length === 0 ? (
+            <div className="mobile-cards-empty">No orders found.</div>
+          ) : (
+            orders.map((o) => (
+              <div key={o.id} className="bill-card">
+                <div className="bill-card-header">
+                  <span className="bill-card-number">{o.order_number}</span>
+                  <span className="badge" style={STATUS_STYLE[o.status]}>{o.status}</span>
+                </div>
+                <div className="bill-card-body">
+                  <div className="bill-card-row">
+                    <span className="bill-card-label">Date &amp; Time</span>
+                    <span className="bill-card-value">{fmtDate(o.created_at)}, {fmtTime(o.created_at)}</span>
+                  </div>
+                  <div className="bill-card-row">
+                    <span className="bill-card-label">Type</span>
+                    <span className="badge" style={TYPE_STYLE[o.type] || {}}>{TYPE_LABEL[o.type] || o.type}</span>
+                  </div>
+                  {isAdmin && (
+                    <div className="bill-card-row">
+                      <span className="bill-card-label">Cashier</span>
+                      <span className="bill-card-value">{o.cashier_name || "—"}</span>
+                    </div>
+                  )}
+                  <div className="bill-card-row">
+                    <span className="bill-card-label">Payment</span>
+                    <span>
+                      {o.payment_status ? (
+                        <span className="badge" style={PAY_STYLE[o.payment_status]}>{o.payment_status}</span>
+                      ) : (
+                        <span style={{ color: "#aaa", fontSize: "12px" }}>Unpaid</span>
+                      )}
+                    </span>
+                  </div>
+                  <div className="bill-card-row bill-card-total-row">
+                    <span className="bill-card-label">Total</span>
+                    <span className="bill-card-total">Rs. {parseFloat(o.total).toFixed(2)}</span>
+                  </div>
+                </div>
+                <div className="bill-card-actions">
+                  {isAdmin && o.status !== "cancelled" && o.status !== "completed" && (
+                    <button
+                      className="btn btn-sm"
+                      style={{ background: "#FEF2F2", color: "#EF4444", border: "1px solid #FECACA" }}
+                      onClick={() => handleCancelOrder(o.id, o.order_number)}
+                      disabled={cancellingId === o.id}
+                    >
+                      {cancellingId === o.id ? "..." : "Cancel"}
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-sm btn-secondary"
+                    onClick={() => setSelectedId(o.id)}
+                  >
+                    View
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
 
       {selectedId && (
         <OrderDetailModal

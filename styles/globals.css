@@ -2092,6 +2092,101 @@ button {
   flex-shrink: 0;
 }
 
+/* ── Mobile card view (Orders / Bills) ─────────────────────────────────────── */
+/* Hidden by default — shown only in the mobile breakpoint below */
+.mobile-cards-wrap {
+  display: none;
+}
+
+/* desktop-table-wrap is always visible on desktop; hidden on mobile */
+.desktop-table-wrap {
+  display: block;
+}
+
+.bill-card {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.bill-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.bill-card-number {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.2px;
+}
+
+.bill-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #F3F4F6;
+}
+
+.bill-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bill-card-label {
+  font-size: 12px;
+  color: #6B7280;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.bill-card-value {
+  font-size: 13px;
+  color: #374151;
+  font-weight: 500;
+  text-align: right;
+}
+
+.bill-card-total-row {
+  margin-top: 2px;
+}
+
+.bill-card-total {
+  font-size: 17px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.3px;
+}
+
+.bill-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bill-card-actions .btn {
+  flex: 1;
+  text-align: center;
+  justify-content: center;
+}
+
+.mobile-cards-empty {
+  text-align: center;
+  color: #bbb;
+  padding: 40px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #E5E7EB;
+  font-size: 14px;
+}
+
 /* ── Order detail modal ─────────────────────────────────────────────────────── */
 .order-meta-grid {
   display: grid;
@@ -5108,6 +5203,15 @@ button {
 
   /* ── Orders / Payments mobile ───────────────────────────────────────────── */
 
+  /* Switch from table to cards on mobile */
+  .desktop-table-wrap {
+    display: none;
+  }
+
+  .mobile-cards-wrap {
+    display: block;
+  }
+
   /* Hide mobile-designated columns (Items, Status on orders; Table, Order on payments) */
   .col-hide-mobile {
     display: none;
@@ -5152,27 +5256,8 @@ button {
     font-size: 16px;
   }
 
-  /* Orders/Payments: tighter cell padding on mobile */
-  .orders-table th,
-  .orders-table td,
-  .payments-table th,
-  .payments-table td {
-    padding: 9px 10px;
-    font-size: 13px;
-  }
-
-  /* Payments: action buttons stay in a row — table scrolls horizontally */
-  .payments-actions-wrap {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    gap: 4px;
-    min-width: unset;
-  }
-
-  .payments-actions-wrap .btn {
-    width: auto;
-    text-align: center;
-  }
+  /* Orders/Payments table rules below are no longer needed at 768px since the
+     table is replaced by cards, but kept for any intermediate breakpoints. */
 
   /* ── Forms mobile ────────────────────────────────────────────────────────── */
 
