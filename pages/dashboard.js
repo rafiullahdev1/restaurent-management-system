@@ -180,12 +180,23 @@ function TodayProductSales({ rows }) {
 
 // ── Recent orders table ───────────────────────────────────────────────────────
 
+const TYPE_BADGE = {
+  "dine-in":  { background: "#EFF6FF", color: "#3B82F6" },
+  "delivery": { background: "#f3f0ff", color: "#7048e8" },
+  "takeaway": { background: "#fff8f0", color: "#e67700" },
+};
+const TYPE_LABEL = {
+  "dine-in": "Dine In", "delivery": "Delivery", "takeaway": "Takeaway",
+};
+
 function RecentOrders({ orders }) {
   return (
     <div className="dash-chart-wrap" style={{ padding: "20px 0 0" }}>
       <p className="dash-section-title" style={{ padding: "0 24px" }}>Recent Orders</p>
+
+      {/* Desktop: table */}
       <div
-        className="table-container"
+        className="table-container dash-recent-table-wrap"
         style={{ borderRadius: 0, border: "none", boxShadow: "none", borderTop: "1px solid #ebebeb" }}
       >
         <table className="data-table">
@@ -214,17 +225,8 @@ function RecentOrders({ orders }) {
                   <td style={{ color: "#6B7280", fontSize: "13px" }}>{fmtTime(o.created_at)}</td>
                   <td style={{ color: "#555" }}>{o.cashier_name || "—"}</td>
                   <td>
-                    <span
-                      className="badge"
-                      style={
-                        o.type === "dine-in"
-                          ? { background: "#EFF6FF", color: "#3B82F6" }
-                          : o.type === "delivery"
-                          ? { background: "#f3f0ff", color: "#7048e8" }
-                          : { background: "#fff8f0", color: "#e67700" }
-                      }
-                    >
-                      {o.type === "dine-in" ? "Dine In" : o.type === "delivery" ? "Delivery" : "Takeaway"}
+                    <span className="badge" style={TYPE_BADGE[o.type] || {}}>
+                      {TYPE_LABEL[o.type] || o.type}
                     </span>
                   </td>
                   <td style={{ fontWeight: 600, color: "#111827" }}>Rs. {fmt(o.total)}</td>
@@ -243,6 +245,52 @@ function RecentOrders({ orders }) {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Tablet + Mobile: cards */}
+      <div className="dash-recent-cards-wrap" style={{ padding: "12px 16px 4px" }}>
+        {orders.length === 0 ? (
+          <div className="mobile-cards-empty">No orders yet today.</div>
+        ) : (
+          orders.map((o) => (
+            <div key={o.id} className="bill-card">
+              <div className="bill-card-header">
+                <span className="bill-card-number">{o.order_number}</span>
+                <span className="badge" style={STATUS_STYLE[o.status]}>{o.status}</span>
+              </div>
+              <div className="bill-card-body">
+                <div className="bill-card-row">
+                  <span className="bill-card-label">Time</span>
+                  <span className="bill-card-value">{fmtTime(o.created_at)}</span>
+                </div>
+                <div className="bill-card-row">
+                  <span className="bill-card-label">Type</span>
+                  <span className="badge" style={TYPE_BADGE[o.type] || {}}>
+                    {TYPE_LABEL[o.type] || o.type}
+                  </span>
+                </div>
+                <div className="bill-card-row">
+                  <span className="bill-card-label">Cashier</span>
+                  <span className="bill-card-value">{o.cashier_name || "—"}</span>
+                </div>
+                <div className="bill-card-row">
+                  <span className="bill-card-label">Payment</span>
+                  <span>
+                    {o.payment_status ? (
+                      <span className="badge" style={PAY_STYLE[o.payment_status]}>
+                        {o.payment_method} / {o.payment_status}
+                      </span>
+                    ) : <span style={{ color: "#aaa", fontSize: "12px" }}>Unpaid</span>}
+                  </span>
+                </div>
+                <div className="bill-card-row bill-card-total-row">
+                  <span className="bill-card-label">Total</span>
+                  <span className="bill-card-total">Rs. {fmt(o.total)}</span>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

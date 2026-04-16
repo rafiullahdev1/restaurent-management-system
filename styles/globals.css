@@ -2103,6 +2103,16 @@ button {
   display: block;
 }
 
+/* ── Dashboard Recent Orders: card view (tablet + mobile) ───────────────────── */
+/* Cards hidden on desktop; table hidden on tablet/mobile (see breakpoints) */
+.dash-recent-cards-wrap {
+  display: none;
+}
+
+.dash-recent-table-wrap {
+  display: block;
+}
+
 .bill-card {
   background: #fff;
   border: 1px solid #E5E7EB;
@@ -4617,6 +4627,15 @@ button {
     min-height: 38px;
     white-space: nowrap;
     flex-shrink: 0;
+  }
+
+  /* ── Dashboard Recent Orders: switch to cards on tablet ───────────────────── */
+  .dash-recent-table-wrap {
+    display: none;
+  }
+
+  .dash-recent-cards-wrap {
+    display: block;
   }
 
   /* ── Orders / Payments tablet ─────────────────────────────────────────────── */
